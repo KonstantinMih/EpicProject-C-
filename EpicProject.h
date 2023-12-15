@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include <cstring>
-#include <math.h>
+//#include <math.h>
+#include <cmath>
 
 class Map {
 private:
@@ -35,18 +36,27 @@ public:
 	double y;
 	double angle;
 	double fov;
-	const double step = 0.5;
+	const double speed = 0.1;
+	const double rotate_speed = 0.2;
 
 	Player(double x, double y, double angle = pi / 2 , double fov = pi / 3) : x(x), y(y), angle(angle), fov(fov) {}
 
 	void move_forward() {
-		x += step * cos(angle);
-		y += step * sin(angle);
+		x += speed * cos(angle);
+		y += speed * sin(angle);
 	}
 
 	void move_back() {
-		x -= step * cos(angle);
-		y -= step * sin(angle);
+		x -= speed * cos(angle);
+		y -= speed * sin(angle);
+	}
+
+	void turn_right() {
+		angle += rotate_speed;
+	}
+
+	void turn_left() {
+		angle -= rotate_speed;
 	}
 
 };

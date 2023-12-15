@@ -43,20 +43,14 @@ int main()
 
 			if (event.type == sf::Event::KeyPressed)   // Кнопочки
 			{
-
-				switch (event.key.code) {
-				case(sf::Keyboard::Escape):
-					window.close();
-					break;
-				case(sf::Keyboard::W):
-					player.move_forward();
-					break;
-				case(sf::Keyboard::S):
-					player.move_back();
-					break;
-				}
-
+				if (event.key.code == sf::Keyboard::Escape) window.close();
 			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) player.move_forward();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) player.move_back();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) player.turn_left();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) player.turn_right();
+
 		}
 
 		window.clear(sf::Color::White);
@@ -65,20 +59,36 @@ int main()
 		for (size_t i = 0; i != window_x; ++i) {    // for по i - номеру луча 
 			double phi = player.angle - player.fov / 2 + (i * player.fov) / window_x;
 
-			for (double t = 0; t < 20; t += .05) {  // for по t - расстаянию от игрока
-				double cx = player.x + t * cos(phi);
-				double cy = player.y + t * sin(phi);
-				if (my_map(int(cx), int(cy)) != ' ') {
+			for (double r = 0; r < 20; r += .05) {  // for по t - расстаянию от игрока
+
+				double wall_x = player.x + r * cos(phi);
+				double wall_y = player.y + r * sin(phi);
+				if (my_map(int(wall_x), int(wall_y)) != ' ') {
 
 					size_t wall_height;
-
-					if (t != 0) wall_height = window_y / t;
-					else wall_height = window_y;
+					
+					if (r != 0) {
+						if (cos(phi - player.angle) != 0) wall_height = window_y / (r * abs(cos(phi - player.angle)));
+						else wall_height = window_y / (r);
+					}
+					else {
+						wall_height = window_y;
+					}
 
 					sf::RectangleShape rectangle(sf::Vector2f(1, wall_height));   //отрисовка стен
 					rectangle.setPosition(i, window_y / 2 - wall_height / 2);
+
+					/*switch (my_map(int(wall_x), int(wall_y))) {
+					case('0'): rectangle.setFillColor(sf::Color::Blue); break;
+					case('1'): rectangle.setFillColor(sf::Color::Red); break;
+					case('2'): rectangle.setFillColor(sf::Color::Green); break;
+					case('3'): rectangle.setFillColor(sf::Color::Cyan); break;
+					}*/
+
 					rectangle.setFillColor(sf::Color::Blue);
 					window.draw(rectangle);
+
+					break;
 				}
 			}
 		}
