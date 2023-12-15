@@ -55,8 +55,10 @@ int main()
 
 		window.clear(sf::Color::White);
 
+		short previous_column = SHRT_MIN;
+
 		// начало reycasting'а
-		for (size_t i = 0; i != window_x; ++i) {    // for по i - номеру луча 
+		for (unsigned short i = 0; i != window_x; ++i) {    // for по i - номеру луча 
 			double phi = player.angle - player.fov / 2 + (i * player.fov) / window_x;
 
 			for (double r = 0; r < 20; r += .05) {  // for по t - расстаянию от игрока
@@ -64,31 +66,34 @@ int main()
 				double wall_x = player.x + r * cos(phi);
 				double wall_y = player.y + r * sin(phi);
 				if (my_map(int(wall_x), int(wall_y)) != ' ') {
+						
+					double ray_direction = player.fov * (floor(0.5 * window_x) - i) / (window_x - 1);
+					double ray_projection_pos = 0.5 * tan(ray_direction) / tan(0.5 * player.fov);
 
-					size_t wall_height;
-					
-					if (r != 0) {
-						if (cos(phi - player.angle) != 0) wall_height = window_y / (r * abs(cos(phi - player.angle)));
-						else wall_height = window_y / (r);
+					short current_column = static_cast<short>(round(window_x * (0.5 - ray_projection_pos)));
+					short next_column = window_x;
+
+					if (i < window_x - 1) {
+						double next_ray_direction = player.fov * (floor(0.5 * window_x) - 1 - i) / (window_x - 1);
+
+						ray_projection_pos = 0.5 * tan(next_ray_direction) / tan(0.5 * player.fov);
+
+						next_column = static_cast<short>(round(window_x * (0.5 - ray_projection_pos)));
 					}
-					else {
-						wall_height = window_y;
+
+					if (previous_column < current_column) {
+						double wall_height = round(window_y / (r * abs(cos(phi - player.angle))));
+
+						sf::RectangleShape rectangle(sf::Vector2f(std::max(1, next_column - current_column), wall_height));
+						rectangle.setPosition(current_column, window_y / 2 - wall_height / 2);
+						rectangle.setFillColor(sf::Color::Blue);
+
+						previous_column = current_column;
+
+						window.draw(rectangle);
 					}
 
-					sf::RectangleShape rectangle(sf::Vector2f(1, wall_height));   //отрисовка стен
-					rectangle.setPosition(i, window_y / 2 - wall_height / 2);
 
-					/*switch (my_map(int(wall_x), int(wall_y))) {
-					case('0'): rectangle.setFillColor(sf::Color::Blue); break;
-					case('1'): rectangle.setFillColor(sf::Color::Red); break;
-					case('2'): rectangle.setFillColor(sf::Color::Green); break;
-					case('3'): rectangle.setFillColor(sf::Color::Cyan); break;
-					}*/
-
-					rectangle.setFillColor(sf::Color::Blue);
-					window.draw(rectangle);
-
-					break;
 				}
 			}
 		}
