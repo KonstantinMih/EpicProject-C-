@@ -35,7 +35,7 @@ public:
 	double y;
 	double angle;
 	double fov;
-	const double step = 5;
+	const double step = 0.5;
 
 	Player(double x, double y, double angle = pi / 2 , double fov = pi / 3) : x(x), y(y), angle(angle), fov(fov) {}
 

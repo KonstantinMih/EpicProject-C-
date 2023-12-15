@@ -35,13 +35,13 @@ int main()
 
 	sf::Event event;
 
-	while (window.isOpen())
+	while (window.isOpen())  // Начало процессов
 	{
 		while (window.pollEvent(event))\
 		{
 			if (event.type == sf::Event::Closed) window.close();
 
-			if (event.type == sf::Event::KeyPressed)
+			if (event.type == sf::Event::KeyPressed)   // Кнопочки
 			{
 
 				switch (event.key.code) {
@@ -59,17 +59,30 @@ int main()
 			}
 		}
 
-		for (size_t i = 0; i != window_x; ++i) {
+		window.clear(sf::Color::White);
+
+		// начало reycasting'а
+		for (size_t i = 0; i != window_x; ++i) {    // for по i - номеру луча 
 			double phi = player.angle - player.fov / 2 + (i * player.fov) / window_x;
 
-			for (double t = 0; t < 20; t += .05) {
-				double cx = player.x + t * cos(player.angle);
-				double cy = player.y + t * sin(player.angle);
-				if (my_map(int(cx), int(cy)) != ' ') break;
+			for (double t = 0; t < 20; t += .05) {  // for по t - расстаянию от игрока
+				double cx = player.x + t * cos(phi);
+				double cy = player.y + t * sin(phi);
+				if (my_map(int(cx), int(cy)) != ' ') {
+
+					size_t wall_height;
+
+					if (t != 0) wall_height = window_y / t;
+					else wall_height = window_y;
+
+					sf::RectangleShape rectangle(sf::Vector2f(1, wall_height));   //отрисовка стен
+					rectangle.setPosition(i, window_y / 2 - wall_height / 2);
+					rectangle.setFillColor(sf::Color::Blue);
+					window.draw(rectangle);
+				}
 			}
 		}
 
-		window.clear();
 		window.display();
 	}
 
