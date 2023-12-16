@@ -23,12 +23,15 @@ int main()
 						"0              0"\
 						"0002222222200000";
 
-	Map my_map = Map(16, 16, &proto_map[0]);
+	const Map my_map = Map(16, 16, &proto_map[0]);
 
-	Player player = Player(3.456, 2.345, 1.523);
+	Player player = Player(13.456, 12.345, 1.523);
 
-	size_t const window_x = 512;
-	size_t const window_y = 512;
+	size_t const window_x = 1024;
+	size_t const window_y = 1024;
+
+	size_t cell_size_x = window_x / my_map.get_size_x();
+	size_t cell_size_y = window_y / my_map.get_size_y();
 
 	sf::RenderWindow window(sf::VideoMode(window_x, window_y), "bruh");
 	window.setFramerateLimit(60);
@@ -46,8 +49,10 @@ int main()
 				if (event.key.code == sf::Keyboard::Escape) window.close();
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) player.move_forward();
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) player.move_back();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) player.move_forward(cell_size_x, cell_size_y, &proto_map[0], 16, 16);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) player.move_back(cell_size_x, cell_size_y, &proto_map[0], 16, 16);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) player.strife_left(cell_size_x, cell_size_y, &proto_map[0], 16, 16);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) player.strife_right(cell_size_x, cell_size_y, &proto_map[0], 16, 16);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) player.turn_left();
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) player.turn_right();
 
@@ -86,7 +91,12 @@ int main()
 
 						sf::RectangleShape rectangle(sf::Vector2f(std::max(1, next_column - current_column), wall_height));
 						rectangle.setPosition(current_column, window_y / 2 - wall_height / 2);
-						rectangle.setFillColor(sf::Color::Blue);
+						switch (my_map(int(wall_x), int(wall_y))) {
+						case('0'): rectangle.setFillColor(sf::Color::Blue); break;
+						case('1'): rectangle.setFillColor(sf::Color::Red); break;
+						case('2'): rectangle.setFillColor(sf::Color::Green); break;
+						case('3'): rectangle.setFillColor(sf::Color::Cyan); break;
+						}
 
 						previous_column = current_column;
 
