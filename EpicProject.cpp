@@ -36,6 +36,11 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(window_x, window_y), "bruh");
 	window.setFramerateLimit(60);
 
+	sf::Texture wall_texture;
+	wall_texture.loadFromFile("Wall64.png");
+	sf::Sprite wall_sprite;
+	wall_sprite.setTexture(wall_texture);
+
 	sf::Event event;
 
 	while (window.isOpen())  // Начало процессов
@@ -91,16 +96,24 @@ int main()
 
 						sf::RectangleShape rectangle(sf::Vector2f(std::max(1, next_column - current_column), wall_height));
 						rectangle.setPosition(current_column, window_y / 2 - wall_height / 2);
-						switch (my_map(int(wall_x), int(wall_y))) {
-						case('0'): rectangle.setFillColor(sf::Color::Blue); break;
-						case('1'): rectangle.setFillColor(sf::Color::Red); break;
-						case('2'): rectangle.setFillColor(sf::Color::Green); break;
-						case('3'): rectangle.setFillColor(sf::Color::Cyan); break;
-						}
 
 						previous_column = current_column;
 
+						double wall_texture_x = 0;
+
+						if (abs(wall_x - cell_size_x * round(wall_x / cell_size_x)) < abs(wall_y - cell_size_y * round(wall_y / cell_size_y))) {
+							wall_texture_x = wall_y - cell_size_y * floor(wall_y / cell_size_y);
+						}
+						else {
+							wall_texture_x = cell_size_x * ceil(wall_x / cell_size_x) - wall_x;
+						}
+
+						wall_sprite.setPosition(current_column, window_y / 2 - wall_height / 2);
+						wall_sprite.setTextureRect(sf::IntRect(wall_texture_x, 0, 1, cell_size_x)); 
+						wall_sprite.setScale(std::max(1, next_column - current_column), wall_height/ cell_size_y);
+
 						window.draw(rectangle);
+						window.draw(wall_sprite);
 					}
 
 

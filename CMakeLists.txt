@@ -6,7 +6,10 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-set(PROJECT_SRC "EpicProject.cpp" "EpicProject.h")
+set(PROJECT_SRC "EpicProject.cpp" "EpicProject.h" "Wall64.png")
+
+include_directories( images/ )
+
 
 add_executable (EpicProject "${PROJECT_SRC}")
 target_link_libraries(EpicProject PRIVATE sfml-graphics)
